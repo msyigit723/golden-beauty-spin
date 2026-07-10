@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { verifyAdminToken } from '@/lib/jwt';
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const token = request.cookies.get('gbs-admin-token')?.value;
   if (!token || !verifyAdminToken(token)) {
     return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
@@ -32,7 +33,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         icon: body.icon,
         image_url: body.image_url
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -43,7 +44,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const token = request.cookies.get('gbs-admin-token')?.value;
   if (!token || !verifyAdminToken(token)) {
     return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
@@ -54,7 +56,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     const { error } = await supabase
       .from('prizes')
       .update({ is_deleted: true })
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) throw error;
     return NextResponse.json({ success: true });

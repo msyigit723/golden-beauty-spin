@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SpinWheel, CampaignSegment } from '@/components/wheel/SpinWheel';
+import { SpinWheel } from '@/components/wheel/SpinWheel';
 import { supabase } from '@/lib/supabase';
 import { cookies } from 'next/headers';
 import { verifyUserToken } from '@/lib/jwt';

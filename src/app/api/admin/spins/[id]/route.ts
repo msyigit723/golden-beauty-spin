@@ -3,7 +3,8 @@ import { supabase } from '@/lib/supabase';
 import { verifyAdminToken } from '@/lib/jwt';
 import { logAdminAction } from '@/lib/audit';
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const token = request.cookies.get('gbs-admin-token')?.value;
   if (!token || !verifyAdminToken(token)) {
     return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
@@ -18,7 +19,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         is_delivered: body.is_delivered,
         delivery_note: body.delivery_note
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -28,7 +29,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       req: request,
       adminUsername: 'admin',
       actionType: 'UPDATE_DELIVERY',
-      targetId: params.id,
+      targetId: id,
       details: { is_delivered: body.is_delivered }
     });
 
