@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       .from('users')
       .select('id')
       .eq('phone', cleanPhone)
-      .single();
+      .maybeSingle();
 
     let userId: string;
 
@@ -31,15 +31,16 @@ export async function POST(request: Request) {
       // Existing user — authenticate directly
       userId = existingUser.id;
     } else {
-      // New user — create with nullable fields
+      // New user — create with fallback values to satisfy existing NOT NULL constraints
+      // since the database migration might not be applied
       const { data: newUser, error: insertError } = await supabase
         .from('users')
         .insert([
           {
             phone: cleanPhone,
-            name: null,
-            surname: null,
-            password_hash: null,
+            name: '',
+            surname: '',
+            password_hash: '',
           },
         ])
         .select('id')
