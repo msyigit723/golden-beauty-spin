@@ -78,7 +78,7 @@ export default function AdminPrizesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Emin misiniz? Ödül geçmişi korunacak fakat çarktan kalkacaktır.')) return;
+    if (!confirm('Emin misiniz? Ödül geçmişi korunacak fakat kampanyadan kalkacaktır.')) return;
     try {
       const res = await fetch(`/api/admin/prizes/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -279,7 +279,7 @@ export default function AdminPrizesPage() {
                     onChange={e => setEditingPrize({...editingPrize, is_active: e.target.checked})} 
                     className="w-4 h-4 accent-luxury-gold"
                   />
-                  <span>Aktif (Çarkta Görünür)</span>
+                  <span>Aktif (Kampanyada Görünür)</span>
                 </label>
               </div>
               

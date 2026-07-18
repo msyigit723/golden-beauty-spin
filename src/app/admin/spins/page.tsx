@@ -108,7 +108,7 @@ export default function AdminSpinsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-serif font-bold">Kazananlar & Teslimat</h1>
-          <p className="text-sm text-gray-500">Çarkı çeviren kullanıcıları yönetin ve CSV olarak dışa aktarın.</p>
+          <p className="text-sm text-gray-500">Kampanyaya katılan kullanıcıları yönetin ve CSV olarak dışa aktarın.</p>
         </div>
         <Button onClick={exportCSV} className="bg-green-600 hover:bg-green-700">CSV İndir</Button>
       </div>
