@@ -47,16 +47,16 @@ export function GiftBoxGame({ hasSpun: initialHasSpun }: GiftBoxGameProps) {
 
       setPrize({ id: data.prize_id, title: data.title });
 
-      // Ensure minimum 1200ms for loading animation as per requirement
+      // Ensure minimum 1000ms for loading animation (faster reveal)
       setTimeout(() => {
         setGameState('OPENING');
         
         setTimeout(() => {
           setGameState('REVEALED');
           setHasSpun(true);
-        }, 600); // 1200 + 600 = 1800ms total
+        }, 500); // 1000 + 500 = 1500ms total
         
-      }, 1200);
+      }, 1000);
 
     } catch (err: any) {
       setErrorMsg(err.message);
@@ -96,20 +96,35 @@ export function GiftBoxGame({ hasSpun: initialHasSpun }: GiftBoxGameProps) {
         )}
       </AnimatePresence>
 
+      {/* BACKGROUND DIM/BLUR OVERLAY */}
+      <AnimatePresence>
+        {gameState !== 'IDLE' && gameState !== 'ERROR' && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
+            className="absolute inset-0 z-10 bg-luxury-bg-primary/85 backdrop-blur-md pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
+
       {/* REVEALED CONGRATULATIONS OVERLAY */}
       <AnimatePresence>
         {gameState === 'REVEALED' && prize && (
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="absolute z-40 w-full max-w-lg p-10 bg-luxury-surface/90 backdrop-blur-xl rounded-3xl border border-luxury-gold/30 shadow-[0_0_80px_rgba(212,175,55,0.2)] text-center"
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="absolute z-40 w-full max-w-lg p-10 bg-luxury-surface/95 backdrop-blur-xl rounded-3xl border border-luxury-gold/30 shadow-[0_0_100px_rgba(212,175,55,0.15)] text-center"
+            style={{ willChange: 'transform, opacity' }}
           >
             <motion.h2 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="font-serif text-4xl font-bold text-luxury-gold mb-2"
+              transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+              className="font-serif text-4xl md:text-5xl font-bold text-luxury-gold mb-4 drop-shadow-md"
+              style={{ willChange: 'transform, opacity' }}
             >
               Tebrikler!
             </motion.h2>
@@ -117,19 +132,28 @@ export function GiftBoxGame({ hasSpun: initialHasSpun }: GiftBoxGameProps) {
             <motion.p 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="text-xs tracking-[0.2em] text-luxury-text-muted mb-6 uppercase"
+              transition={{ delay: 0.8, duration: 1 }}
+              className="text-xs md:text-sm tracking-[0.25em] text-luxury-text-muted mb-6 uppercase"
+              style={{ willChange: 'transform, opacity' }}
             >
               KAZANDIĞINIZ HEDİYE
             </motion.p>
             
             <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 1, type: "spring" }}
-              className="py-6 px-4 bg-black/40 rounded-2xl border border-luxury-gold/20 mb-8"
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1.5, duration: 1, type: "spring", stiffness: 50, damping: 15 }}
+              className="py-8 px-6 bg-gradient-to-b from-[#2A2A2A] to-[#141414] rounded-2xl border border-luxury-gold/40 shadow-premium mb-8 relative overflow-hidden"
+              style={{ willChange: 'transform, opacity' }}
             >
-              <h3 className="text-2xl md:text-3xl font-bold text-luxury-white">
+              {/* Premium Animated Shine Effect */}
+              <motion.div 
+                className="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-45deg]"
+                initial={{ x: '-100%' }}
+                animate={{ x: '100%' }}
+                transition={{ delay: 2.0, duration: 1.5, ease: "easeInOut" }}
+              />
+              <h3 className="text-2xl md:text-4xl font-bold text-luxury-gold-highlight relative z-10 drop-shadow-lg leading-tight">
                 {prize.title}
               </h3>
             </motion.div>
@@ -137,8 +161,9 @@ export function GiftBoxGame({ hasSpun: initialHasSpun }: GiftBoxGameProps) {
             <motion.p 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1.5 }}
-              className="text-sm text-luxury-text-muted/80"
+              transition={{ delay: 2.5, duration: 1 }}
+              className="text-sm md:text-base text-luxury-text-muted/90"
+              style={{ willChange: 'opacity' }}
             >
               Detaylı bilgi için sizinle iletişime geçeceğiz.
             </motion.p>
@@ -147,7 +172,7 @@ export function GiftBoxGame({ hasSpun: initialHasSpun }: GiftBoxGameProps) {
       </AnimatePresence>
 
       {/* GIFT BOXES GRID */}
-      <div className={`grid grid-cols-3 gap-4 md:gap-8 lg:gap-12 w-full px-4 transition-opacity duration-1000 ${gameState === 'REVEALED' ? 'opacity-20 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`relative z-20 grid grid-cols-3 gap-4 md:gap-8 lg:gap-12 w-full px-4 transition-opacity duration-1000 ${gameState === 'REVEALED' ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         {boxes.map((boxIndex) => (
           <GiftBox 
             key={boxIndex}
