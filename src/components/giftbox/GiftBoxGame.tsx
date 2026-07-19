@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GiftBox } from './GiftBox';
+import { audioManager } from '@/lib/audio';
 
 interface GiftBoxGameProps {
   hasSpun: boolean;
@@ -19,6 +20,12 @@ export function GiftBoxGame({ hasSpun }: GiftBoxGameProps) {
   const handleSelectBox = async (index: number) => {
     if (isDone || isLoading || selectedIndex !== null) return;
     
+    // Initialize audio cache on first interaction
+    audioManager.init();
+    
+    // Stage 1: Soft wooden/luxury box movement sound (Volume 0.2)
+    audioManager.play('box-move', 0.2);
+
     setSelectedIndex(index);
     setIsLoading(true);
     setError(null);
@@ -38,11 +45,19 @@ export function GiftBoxGame({ hasSpun }: GiftBoxGameProps) {
       // Backend success! Start animation
       setIsOpening(true);
       
+      // Stage 2: Exactly when the lid starts opening (matches the 0.6s delay in GiftBox.tsx)
+      setTimeout(() => {
+        audioManager.play('box-open', 0.4);
+      }, 600);
+      
       // Wait for lid to open and light burst to finish before showing result text
       setTimeout(() => {
         setPrizeTitle(data.title);
         setIsDone(true);
         setIsLoading(false);
+        
+        // Stage 3: When the prize card becomes visible
+        audioManager.play('reward-reveal', 0.22);
       }, 2500);
 
     } catch (err: any) {
